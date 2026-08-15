@@ -489,10 +489,10 @@
       </div>
       <div class="season-notes-col">
         <div class="notes-title">Notes for CPO</div>
-        <div class="note-block"><b>August</b> is the standout month — highest volume (128% of average) and highest conversion (23.9%) at once, producing roughly 124 more hires than an average-converting month at that volume would.</div>
-        <div class="note-block"><b>October</b> is a mismatch worth flagging — volume peaks (128% of average) but conversion falls near the year's low (18.7%). Extra applicant flow that month didn't convert proportionally.</div>
-        <div class="note-block"><b>MA</b> runs on its own calendar — correlation to the company-wide monthly pattern is just 0.11. Worth understanding whether it reflects a distinct local hiring cycle before treating it as a risk.</div>
-        <div class="note-block">One year of data — none of these patterns can be confirmed as recurring seasonality yet. Re-check against a second year before acting on timing alone.</div>
+        <div class="note-block"><b>February was a broad slowdown with an additional CA issue.</b> Company volume fell to 71% of average; CA generated about 31% of the total shortfall and operated at only 26% of its own normal volume. Validate whether this followed regional demand or reflected requisition, sourcing, or recruiter-capacity constraints.</div>
+        <div class="note-block"><b>August scaled effectively; October did not.</b> August combined 128% of normal volume with the year's highest Start Rate (23.9%). October reached similar volume but converted only 18.7%, indicating a peak-period funnel-efficiency or capacity issue worth investigating.</div>
+        <div class="note-block"><b>MA follows a distinct cadence.</b> Its monthly volume correlation with the company is only 0.11. Study MA's local demand cycle and quality controls before standardizing its calendar or interpreting the difference as underperformance.</div>
+        <div class="note-block"><b>Monitor cohort quality alongside volume.</b> April had the highest Early Fail Rate (12.2% versus 9.6% overall), while February and December were lowest. Treat these as diagnostic signals—not confirmed seasonality—because only one year is available and none remains conclusive after accounting for multiple monthly comparisons.</div>
       </div>
     </div>
   </div>
@@ -704,7 +704,10 @@ const DATA = {
     "NM": 0.47,
     "CA": 0.68,
     "MA": 0.11,
-    "WI": 0.6
+    "WI": 0.6,
+    "UT": 0.31,
+    "NE": 0.22,
+    "SC": 0.05
   },
   "seasonality_volatility": {
     "OR": 26.6,
@@ -713,7 +716,10 @@ const DATA = {
     "NM": 22.5,
     "CA": 37.8,
     "MA": 26.8,
-    "WI": 31.1
+    "WI": 31.1,
+    "UT": 80.4,
+    "NE": 162.5,
+    "SC": 217.9
   },
   "funnel_overall": {
     "stages": [
@@ -3316,6 +3322,22 @@ const DATA = {
       ]
     }
   },
+  "monthly_early_fail": {
+    "months": [1,2,3,4,5,6,7,8,9,10,11,12],
+    "total": [7.6,6.3,10.1,12.2,11.6,10.4,9.1,11.3,8.0,10.4,9.1,6.8],
+    "by_region": {
+      "OR": [3.8,7.7,11.1,17.5,8.8,11.0,9.1,12.1,16.2,11.7,3.4,6.7],
+      "LA": [6.5,4.9,10.8,8.8,15.9,13.9,12.2,15.9,3.3,8.5,12.0,5.8],
+      "AR": [6.1,1.7,7.6,14.8,8.2,8.9,15.1,12.1,7.5,9.0,9.1,7.6],
+      "NM": [13.7,8.0,14.7,7.4,10.5,13.2,6.3,9.8,4.5,15.3,8.6,7.5],
+      "CA": [6.8,9.1,3.7,13.6,11.2,5.7,3.8,8.8,10.0,15.5,12.6,13.6],
+      "MA": [10.3,8.0,8.3,6.9,11.8,6.8,6.6,1.5,7.8,6.2,8.1,0.0],
+      "WI": [15.0,16.7,10.0,9.4,13.2,8.7,5.6,5.1,4.0,8.1,13.0,5.3],
+      "UT": [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,8.3],
+      "NE": [null,null,null,null,null,null,null,0.0,0.0,0.0,0.0,6.7],
+      "SC": [null,null,null,null,null,0.0,null,null,null,null,0.0,0.0]
+    }
+  },
   "monthly_conversion": {
     "months": [
       1,
@@ -3592,6 +3614,7 @@ function initSeasonChart(){
           backgroundColor:'#6872C9',
           borderRadius:6,
           maxBarThickness:46,
+          grouped:false,
           yAxisID:'yVol',
           order:2
         },
@@ -3599,18 +3622,44 @@ function initSeasonChart(){
           type:'line',
           label:'Company Start Rate',
           data: DATA.monthly_conversion.total,
-          borderColor:'#B7B9C6',
-          backgroundColor:'#B7B9C6',
-          borderWidth:1.5,
-          pointRadius:2.5,
-          pointBackgroundColor:'#B7B9C6',
+          borderColor:'#F29B69',
+          backgroundColor:'#F29B69',
+          borderWidth:2,
+          pointRadius:3,
+          pointBackgroundColor:'#F29B69',
           tension:0.35,
           yAxisID:'yConv',
           order:1
         },
         {
           type:'line',
-          label:'Region overlay',
+          label:'Company Early Fail Rate',
+          data: DATA.monthly_early_fail.total,
+          borderColor:'#087E78',
+          backgroundColor:'#087E78',
+          borderWidth:2,
+          borderDash:[6,4],
+          pointRadius:3,
+          pointBackgroundColor:'#087E78',
+          tension:0.35,
+          yAxisID:'yConv',
+          order:0
+        },
+        {
+          type:'bar',
+          label:'Region Volume',
+          data: [],
+          backgroundColor:'#6872C9',
+          borderRadius:6,
+          maxBarThickness:30,
+          grouped:false,
+          yAxisID:'yVol',
+          order:1,
+          hidden:true
+        },
+        {
+          type:'line',
+          label:'Region Start Rate',
           data: [],
           borderColor:'#F29B69',
           backgroundColor:'#F29B69',
@@ -3618,6 +3667,22 @@ function initSeasonChart(){
           pointRadius:3,
           pointBackgroundColor:'#F29B69',
           tension:0.35,
+          yAxisID:'yConv',
+          order:0,
+          hidden:true
+        },
+        {
+          type:'line',
+          label:'Region Early Fail Rate',
+          data: [],
+          borderColor:'#087E78',
+          backgroundColor:'#087E78',
+          borderWidth:2,
+          borderDash:[6,4],
+          pointRadius:3,
+          pointBackgroundColor:'#087E78',
+          tension:0.35,
+          spanGaps:false,
           yAxisID:'yConv',
           order:0,
           hidden:true
@@ -3651,7 +3716,7 @@ function initSeasonChart(){
           position:'right',
           beginAtZero:true,
           grid:{ display:false },
-          title:{ display:true, text:'Start Rate (%)', font:{family:'DM Sans', weight:'600', size:12}, color:'#676875' },
+          title:{ display:true, text:'Start & Early Fail Rates (%)', font:{family:'DM Sans', weight:'600', size:12}, color:'#676875' },
           ticks:{ font:{family:'DM Sans'}, color:'#676875', callback:v=>v+'%' }
         },
         x:{
@@ -3665,14 +3730,47 @@ function initSeasonChart(){
 }
 
 function updateSeasonChart(regionKey){
-  const overlayDataset = seasonChartInstance.data.datasets[2];
+  const companyVolumeDataset = seasonChartInstance.data.datasets[0];
+  const companyConversionDataset = seasonChartInstance.data.datasets[1];
+  const companyEarlyFailDataset = seasonChartInstance.data.datasets[2];
+  const volumeDataset = seasonChartInstance.data.datasets[3];
+  const conversionDataset = seasonChartInstance.data.datasets[4];
+  const earlyFailDataset = seasonChartInstance.data.datasets[5];
   if (regionKey === 'NONE'){
-    overlayDataset.hidden = true;
-    overlayDataset.data = [];
+    companyVolumeDataset.backgroundColor = '#6872C9';
+    companyVolumeDataset.label = 'Company Volume';
+    companyConversionDataset.borderColor = '#F29B69';
+    companyConversionDataset.backgroundColor = '#F29B69';
+    companyConversionDataset.pointBackgroundColor = '#F29B69';
+    companyConversionDataset.borderDash = [];
+    companyEarlyFailDataset.borderColor = '#087E78';
+    companyEarlyFailDataset.backgroundColor = '#087E78';
+    companyEarlyFailDataset.pointBackgroundColor = '#087E78';
+    volumeDataset.hidden = true;
+    volumeDataset.data = [];
+    conversionDataset.hidden = true;
+    conversionDataset.data = [];
+    earlyFailDataset.hidden = true;
+    earlyFailDataset.data = [];
   } else {
-    overlayDataset.hidden = false;
-    overlayDataset.label = regionKey + ' Start Rate';
-    overlayDataset.data = DATA.monthly_conversion.by_region[regionKey];
+    companyVolumeDataset.backgroundColor = 'rgba(183,185,198,0.38)';
+    companyVolumeDataset.label = 'Company Volume (reference)';
+    companyConversionDataset.borderColor = 'rgba(183,185,198,0.75)';
+    companyConversionDataset.backgroundColor = 'rgba(183,185,198,0.75)';
+    companyConversionDataset.pointBackgroundColor = 'rgba(183,185,198,0.75)';
+    companyConversionDataset.borderDash = [3,3];
+    companyEarlyFailDataset.borderColor = 'rgba(183,185,198,0.55)';
+    companyEarlyFailDataset.backgroundColor = 'rgba(183,185,198,0.55)';
+    companyEarlyFailDataset.pointBackgroundColor = 'rgba(183,185,198,0.55)';
+    volumeDataset.hidden = false;
+    volumeDataset.label = regionKey + ' Volume';
+    volumeDataset.data = DATA.monthly_volume.by_region[regionKey];
+    conversionDataset.hidden = false;
+    conversionDataset.label = regionKey + ' Start Rate';
+    conversionDataset.data = DATA.monthly_conversion.by_region[regionKey];
+    earlyFailDataset.hidden = false;
+    earlyFailDataset.label = regionKey + ' Early Fail Rate';
+    earlyFailDataset.data = DATA.monthly_early_fail.by_region[regionKey];
   }
   seasonChartInstance.update(); // mutate in place -- Chart.js tweens old -> new values, no re-entrance animation
   updateSeasonMeta(regionKey);
@@ -3680,22 +3778,32 @@ function updateSeasonChart(regionKey){
 
 function updateSeasonMeta(regionKey){
   const meta = document.getElementById('seasonMeta');
-  let metaHtml = `
-    <div class="legend-item"><span class="legend-swatch" style="background:#6872C9"></span>Company Volume (primary)</div>
-    <div class="legend-item"><span class="legend-swatch" style="background:#B7B9C6"></span>Company Start Rate (secondary)</div>
-  `;
-  if (regionKey !== 'NONE'){
+  let metaHtml;
+  if (regionKey === 'NONE'){
+    metaHtml = `
+      <div class="legend-item"><span class="legend-swatch" style="background:#6872C9"></span>Company Volume</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#F29B69"></span>Company Start Rate</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#087E78"></span>Company Early Fail Rate</div>
+    `;
+  } else {
     const corr = DATA.seasonality_correlation[regionKey];
     const vol = DATA.seasonality_volatility[regionKey];
-    metaHtml += `<div class="legend-item"><span class="legend-swatch" style="background:#F29B69"></span>${regionKey} Start Rate — correlation: ${corr}, volatility index: ${vol}</div>`;
+    const directional = !DATA.region_meta[regionKey].reliable;
+    metaHtml = `
+      <div class="legend-item"><span class="legend-swatch" style="background:#6872C9"></span>${regionKey} Volume</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#F29B69"></span>${regionKey} Start Rate</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#087E78"></span>${regionKey} Early Fail Rate</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#B7B9C6"></span>Company reference</div>
+      <div class="legend-item">Volume correlation: ${corr} · Volatility index: ${vol}${directional ? ' · Directional only (partial-year activity)' : ''}</div>
+    `;
   }
   meta.innerHTML = metaHtml;
 }
 
 function initSeasonSelect(){
   const sel = document.getElementById('seasonRegionSelect');
-  sel.innerHTML = `<option value="NONE">No region overlay</option>` +
-    MAJOR_REGIONS.map(r=>`<option value="${r}">Overlay: ${r}</option>`).join('');
+  sel.innerHTML = `<option value="NONE">Total View</option>` +
+    ALL_REGIONS.map(r=>`<option value="${r}">${r} View${DATA.region_meta[r].reliable ? '' : ' (Directional)'}</option>`).join('');
   sel.addEventListener('change', e => updateSeasonChart(e.target.value));
   initSeasonChart();
 }
@@ -3731,9 +3839,9 @@ function buildMatrix(){
       const xMid = x.getPixelForValue(avgStart);
       const yMid = y.getPixelForValue(avgBad);
       ctx.save();
-      ctx.fillStyle = 'rgba(242,155,105,0.08)'; // top-right: high start rate, high bad-hire (top of canvas = max y value)
+      ctx.fillStyle = 'rgba(105,198,74,0.06)';
       ctx.fillRect(xMid, top, right-xMid, yMid-top);
-      ctx.fillStyle = 'rgba(105,198,74,0.06)'; // bottom-right: high start rate, low bad-hire
+      ctx.fillStyle = 'rgba(242,155,105,0.08)';
       ctx.fillRect(xMid, yMid, right-xMid, bottom-yMid);
       ctx.fillStyle = 'rgba(103,104,117,0.04)';
       ctx.fillRect(left, top, xMid-left, yMid-top);
@@ -3968,9 +4076,9 @@ function buildChannelMatrix(){
       const xMid = x.getPixelForValue(avgStart);
       const yMid = y.getPixelForValue(avgBad);
       ctx.save();
-      ctx.fillStyle = 'rgba(242,155,105,0.08)'; // top-right: high start rate, high bad-hire (top of canvas = max y value)
+      ctx.fillStyle = 'rgba(105,198,74,0.06)';
       ctx.fillRect(xMid, top, right-xMid, yMid-top);
-      ctx.fillStyle = 'rgba(105,198,74,0.06)'; // bottom-right: high start rate, low bad-hire
+      ctx.fillStyle = 'rgba(242,155,105,0.08)';
       ctx.fillRect(xMid, yMid, right-xMid, bottom-yMid);
       ctx.fillStyle = 'rgba(103,104,117,0.04)';
       ctx.fillRect(left, top, xMid-left, yMid-top);
@@ -4351,8 +4459,8 @@ function buildRecruiterScatter(){
       const xMid = x.getPixelForValue(0);
       const yMid = y.getPixelForValue(0);
       ctx.save();
-      ctx.fillStyle = 'rgba(242,155,105,0.10)'; // top-left: weaker start rate AND worse early-fail (top of canvas = max y value)
-      ctx.fillRect(left, top, xMid-left, yMid-top);
+      ctx.fillStyle = 'rgba(242,155,105,0.10)';
+      ctx.fillRect(left, yMid, xMid-left, bottom-yMid);
       ctx.restore();
     }
   };
