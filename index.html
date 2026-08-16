@@ -89,9 +89,10 @@
     color:var(--brand-indigo);
   }
   .brand-mark{
-    width:30px; height:30px;
-    border-radius:50%;
-    background:linear-gradient(135deg, var(--brand-indigo), var(--brand-periwinkle));
+    width:138px;
+    height:53px;
+    object-fit:contain;
+    object-position:left center;
     flex-shrink:0;
   }
   .tabs{
@@ -156,22 +157,23 @@
     max-width:640px;
   }
   .hero-recommendation{
-    padding:20px 22px;
-    border:1px solid #E7CF78;
-    border-radius:16px;
-    background:#FFF9E6;
+    padding:25px 27px;
+    border:2px solid #DFB92F;
+    border-radius:18px;
+    background:linear-gradient(135deg,#FFF9DF 0%,#FFF1B8 100%);
     color:var(--text-primary);
-    font-size:14px;
-    line-height:1.55;
-    box-shadow:0 8px 24px rgba(151,117,18,0.08);
+    font-size:16px;
+    font-weight:600;
+    line-height:1.5;
+    box-shadow:0 12px 30px rgba(151,117,18,0.18);
   }
   .hero-recommendation-label{
     display:flex;
     align-items:center;
     gap:7px;
-    margin-bottom:6px;
-    color:#8A6810;
-    font-size:11px;
+    margin-bottom:9px;
+    color:#765604;
+    font-size:12px;
     font-weight:700;
     letter-spacing:0.06em;
     text-transform:uppercase;
@@ -179,7 +181,7 @@
   .hero-recommendation-label::before{
     content:'★';
     color:#D7A919;
-    font-size:14px;
+    font-size:16px;
     line-height:1;
   }
 
@@ -512,7 +514,7 @@
 
 <nav>
   <div class="nav-inner">
-    <div class="brand"><span class="brand-mark"></span>Recruiting Review</div>
+    <div class="brand"><img class="brand-mark" src="https://cdn.prod.website-files.com/66837320c941c0723bc3c8c0/66f855f821f12be1287c45ed_ABC%20Action%20Behavior%20Centers%20Logo%20Color.svg" alt="ABC Action Behavior Centers">Recruiting Review</div>
     <div class="tabs">
       <span class="tab active" data-view="overall">Overall</span>
       <span class="tab" data-view="channel">Channel</span>
@@ -530,7 +532,7 @@
       <h1 id="pageTitle">Overall Recruiting Performance</h1>
       <p class="header-sub" id="pageSub">6,972 hires started from 34,058 virtual screens; scaling efficiency varied materially by month.</p>
     </div>
-    <div class="hero-recommendation"><span class="hero-recommendation-label" id="pageRecommendationLabel">Overall priority</span><span id="pageRecommendation">Prepare capacity for August and October, while investigating October’s weak conversion and April’s elevated early-fail rate.</span></div>
+    <div class="hero-recommendation"><span class="hero-recommendation-label" id="pageRecommendationLabel">TL;DR · Overall priority</span><span id="pageRecommendation">Prepare capacity for August and October, while investigating October’s weak conversion and April’s elevated early-fail rate.</span></div>
   </div>
 </div>
 
@@ -5130,7 +5132,7 @@ function updatePageHero(key){
   document.getElementById('pageEyebrow').textContent = m.eyebrow;
   document.getElementById('pageTitle').textContent = m.title;
   document.getElementById('pageSub').textContent = m.sub;
-  document.getElementById('pageRecommendationLabel').textContent = `${m.title.replace(' Performance','')} priority`;
+  document.getElementById('pageRecommendationLabel').textContent = `TL;DR · ${m.title.replace(' Performance','')} priority`;
   document.getElementById('pageRecommendation').textContent = m.rec;
 }
 
