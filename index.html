@@ -125,6 +125,10 @@
   .header-inner{
     max-width:var(--content-width);
     margin:0 auto;
+    display:grid;
+    grid-template-columns:minmax(0,1.6fr) minmax(300px,0.8fr);
+    gap:56px;
+    align-items:center;
   }
   .eyebrow{
     display:inline-block;
@@ -150,6 +154,33 @@
     font-size:18px;
     color:var(--text-muted);
     max-width:640px;
+  }
+  .hero-recommendation{
+    padding:20px 22px;
+    border:1px solid #E7CF78;
+    border-radius:16px;
+    background:#FFF9E6;
+    color:var(--text-primary);
+    font-size:14px;
+    line-height:1.55;
+    box-shadow:0 8px 24px rgba(151,117,18,0.08);
+  }
+  .hero-recommendation-label{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin-bottom:6px;
+    color:#8A6810;
+    font-size:11px;
+    font-weight:700;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+  .hero-recommendation-label::before{
+    content:'★';
+    color:#D7A919;
+    font-size:14px;
+    line-height:1;
   }
 
   /* ---------- MAIN ---------- */
@@ -282,14 +313,16 @@
   .overview-right{
     padding:36px 40px 36px 36px;
   }
-
-  /* ---------- FUNNEL (overlay bars) ---------- */
+  /* ---------- HIRING FUNNEL ---------- */
+  #funnelRows{
+    padding:4px 0;
+  }
   .funnel-row{
     display:grid;
     grid-template-columns:118px 1fr 168px;
     align-items:center;
     gap:16px;
-    height:64px;
+    min-height:62px;
   }
   .fr-label{
     font-size:14px;
@@ -301,16 +334,21 @@
     height:100%;
     display:flex;
     align-items:center;
+    justify-content:center;
   }
   .fr-bar{
-    height:44px;
-    border-radius:10px;
+    height:54px;
     background:linear-gradient(90deg, var(--brand-indigo), var(--brand-periwinkle));
     display:flex;
     align-items:center;
     justify-content:center;
     transition:width 0.6s cubic-bezier(0.65,0,0.35,1);
-    min-width:8px;
+    min-width:54px;
+    clip-path:polygon(4% 0, 96% 0, 90% 100%, 10% 100%);
+    filter:drop-shadow(0 2px 2px rgba(35,32,111,0.12));
+  }
+  .funnel-row:first-child .fr-bar{
+    clip-path:polygon(0 0, 100% 0, 96% 100%, 4% 100%);
   }
   .fr-bar-num{
     color:#FFFFFF;
@@ -333,6 +371,49 @@
     margin-top:1px;
   }
   .fr-conv-step.low{ color:var(--brand-coral); font-weight:700; }
+  .funnel-outcome{
+    display:grid;
+    grid-template-columns:118px 1fr 168px;
+    align-items:center;
+    gap:16px;
+    margin-top:8px;
+  }
+  .funnel-outcome-label{
+    font-size:12px;
+    font-weight:700;
+    color:var(--brand-coral);
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+  .funnel-outcome-branch{
+    position:relative;
+    display:flex;
+    justify-content:center;
+    padding-top:20px;
+  }
+  .funnel-outcome-branch::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:50%;
+    width:2px;
+    height:20px;
+    background:var(--brand-coral);
+  }
+  .funnel-outcome-box{
+    min-width:190px;
+    padding:11px 18px;
+    border:2px solid var(--brand-coral);
+    border-radius:12px;
+    background:rgba(242,155,105,0.12);
+    color:#A8542A;
+    text-align:center;
+    font-size:14px;
+    font-weight:700;
+  }
+  .funnel-outcome-stats{text-align:right;}
+  .funnel-outcome-rate{font-size:14px; font-weight:700; color:#A8542A;}
+  .funnel-outcome-note{font-size:12px; color:var(--text-muted); margin-top:1px;}
 
   /* ---------- SEASONALITY (4-col: 3 chart + 1 notes) ---------- */
   .season-grid{
@@ -414,6 +495,7 @@
   }
 
   @media (max-width: 900px){
+    .header-inner{grid-template-columns:1fr;gap:24px;}
     .overview-grid{grid-template-columns:1fr;}
     .overview-left{border-right:none; border-bottom:1px solid var(--border);}
     .season-grid{grid-template-columns:1fr;}
@@ -422,7 +504,7 @@
     .matrix-wrap{grid-template-columns:1fr;}
     h1{font-size:32px;}
     .tabs{display:none;}
-    .funnel-row{grid-template-columns:90px 1fr 130px;}
+    .funnel-row,.funnel-outcome{grid-template-columns:90px 1fr 130px;}
   }
 </style>
 </head>
@@ -443,9 +525,12 @@
 
 <div class="header-band">
   <div class="header-inner">
-    <span class="eyebrow" id="pageEyebrow">2023 Annual Review</span>
-    <h1 id="pageTitle">Overall Recruiting Performance</h1>
-    <p class="header-sub" id="pageSub">A company-wide view of the hiring funnel, seasonal patterns, and how each region balances conversion against early-hire quality.</p>
+    <div class="header-copy">
+      <span class="eyebrow" id="pageEyebrow">2023 Annual Review</span>
+      <h1 id="pageTitle">Overall Recruiting Performance</h1>
+      <p class="header-sub" id="pageSub">6,972 hires started from 34,058 virtual screens; scaling efficiency varied materially by month.</p>
+    </div>
+    <div class="hero-recommendation"><span class="hero-recommendation-label" id="pageRecommendationLabel">Overall priority</span><span id="pageRecommendation">Prepare capacity for August and October, while investigating October’s weak conversion and April’s elevated early-fail rate.</span></div>
   </div>
 </div>
 
@@ -495,21 +580,6 @@
         <div class="note-block"><b>Monitor cohort quality alongside volume.</b> April had the highest Early Fail Rate (12.2% versus 9.6% overall), while February and December were lowest. Treat these as diagnostic signals—not confirmed seasonality—because only one year is available and none remains conclusive after accounting for multiple monthly comparisons.</div>
       </div>
     </div>
-  </div>
-
-  <!-- REGIONAL MATRIX -->
-  <div class="section-card plain-pad">
-    <div class="section-head" style="padding:0;">
-      <div>
-        <div class="section-title">Regional Performance: Conversion vs. Bad-Hire Rate</div>
-        <div class="section-desc">Each bubble is a region, sized by applicant volume. Bubble position shows the real trade-off (or lack of one) between converting candidates and keeping them past 90 days.</div>
-      </div>
-    </div>
-    <div class="matrix-wrap">
-      <div class="matrix-canvas-wrap"><canvas id="matrixChart"></canvas></div>
-      <div class="quadrant-key" id="quadrantKey"></div>
-    </div>
-    <div class="footnote">Bad-hire rate = % of starters terminated for No Show, Performance, or Culture within 90 days. UT, NE, and SC (each under 200 applicants for the year) are shown smaller and muted — directional only, not reliable for comparison.</div>
   </div>
 
 </div>
@@ -3538,9 +3608,9 @@ function buildStatList(){
   `).join('');
 }
 
-/* ---------------- FUNNEL (overlay bars, CSS-transitioned) ---------------- */
+/* ---------------- FUNNEL (centered, CSS-transitioned) ---------------- */
 function buildFunnelRows(){
-  // build the 5 static rows once; subsequent calls just update widths/text (triggers CSS transition)
+  // Build the five stages once; subsequent calls update the tapered segment widths and labels.
   const stages = DATA.funnel_overall.stages;
   const wrap = document.getElementById('funnelRows');
   if (!wrap.dataset.built){
@@ -3553,7 +3623,17 @@ function buildFunnelRows(){
           <div class="fr-conv-step" id="frStep${i}"></div>
         </div>
       </div>
-    `).join('');
+    `).join('') + `
+      <div class="funnel-outcome">
+        <div class="funnel-outcome-label">90-day outcome</div>
+        <div class="funnel-outcome-branch">
+          <div class="funnel-outcome-box" id="funnelBadHireCount"></div>
+        </div>
+        <div class="funnel-outcome-stats">
+          <div class="funnel-outcome-rate" id="funnelBadHireRate"></div>
+          <div class="funnel-outcome-note">Adverse outcome, not a funnel stage</div>
+        </div>
+      </div>`;
     wrap.dataset.built = '1';
   }
   updateFunnel('TOTAL');
@@ -3562,31 +3642,30 @@ function buildFunnelRows(){
 function updateFunnel(regionKey){
   const f = regionKey === 'TOTAL' ? DATA.funnel_overall : DATA.funnel_by_region[regionKey];
   const stages = DATA.funnel_overall.stages;
-  const globalMax = DATA.funnel_overall.counts[0]; // fixed reference (company total) -- widths are NOT renormalized per region, so true scale is visible when switching
+  const selectedMax = f.counts[0];
   stages.forEach((stage,i) => {
-    const pctWidth = f.counts[i]/globalMax*100;
-    const barWidth = Math.max(pctWidth, 3); // floor only so a sliver is still clickable/visible, not for legibility scaling
+    const pctWidth = selectedMax ? f.counts[i]/selectedMax*100 : 0;
+    const barWidth = Math.max(pctWidth, 8);
     const stepConv = f.step_conversion[i];
     const isLow = i>0 && stepConv < 60;
     const bar = document.getElementById(`frBar${i}`);
     const num = document.getElementById(`frNum${i}`);
     bar.style.width = barWidth + '%';
     num.textContent = fmt(f.counts[i]);
-    // if the bar is too narrow for the number to sit inside legibly, place it just outside instead
-    if (pctWidth < 13){
-      num.style.position = 'absolute';
-      num.style.left = 'calc(' + barWidth + '% + 10px)';
-      num.style.color = 'var(--brand-indigo)';
-    } else {
-      num.style.position = 'static';
-      num.style.left = 'auto';
-      num.style.color = '#FFFFFF';
-    }
+    num.style.position = 'static';
+    num.style.left = 'auto';
+    num.style.color = '#FFFFFF';
     document.getElementById(`frTotal${i}`).textContent = f.pct_of_total[i] + '% of total';
     const stepEl = document.getElementById(`frStep${i}`);
     stepEl.textContent = i===0 ? '—' : stepConv + '% step conversion';
     stepEl.className = 'fr-conv-step' + (isLow ? ' low' : '');
   });
+  const badHireRate = regionKey === 'TOTAL'
+    ? DATA.bad_hire_rate_overall
+    : DATA.bad_hire_rate_by_region[regionKey].early_fail_rate;
+  const badHireCount = Math.round(f.counts[4] * badHireRate / 100);
+  document.getElementById('funnelBadHireCount').textContent = `≈${fmt(badHireCount)} early bad hires`;
+  document.getElementById('funnelBadHireRate').textContent = `${badHireRate}% of starters`;
 }
 
 function initFunnelSelect(){
@@ -3635,12 +3714,14 @@ function initSeasonChart(){
           type:'line',
           label:'Company Early Fail Rate',
           data: DATA.monthly_early_fail.total,
-          borderColor:'#087E78',
-          backgroundColor:'#087E78',
-          borderWidth:2,
+          borderColor:'#16A34A',
+          backgroundColor:'#16A34A',
+          borderWidth:3,
           borderDash:[6,4],
-          pointRadius:3,
-          pointBackgroundColor:'#087E78',
+          pointRadius:4,
+          pointBackgroundColor:'#16A34A',
+          pointBorderColor:'#FFFFFF',
+          pointBorderWidth:2,
           tension:0.35,
           yAxisID:'yConv',
           order:0
@@ -3675,12 +3756,14 @@ function initSeasonChart(){
           type:'line',
           label:'Region Early Fail Rate',
           data: [],
-          borderColor:'#087E78',
-          backgroundColor:'#087E78',
-          borderWidth:2,
+          borderColor:'#16A34A',
+          backgroundColor:'#16A34A',
+          borderWidth:3,
           borderDash:[6,4],
-          pointRadius:3,
-          pointBackgroundColor:'#087E78',
+          pointRadius:4,
+          pointBackgroundColor:'#16A34A',
+          pointBorderColor:'#FFFFFF',
+          pointBorderWidth:2,
           tension:0.35,
           spanGaps:false,
           yAxisID:'yConv',
@@ -3715,6 +3798,8 @@ function initSeasonChart(){
         yConv:{
           position:'right',
           beginAtZero:true,
+          min:0,
+          max:40,
           grid:{ display:false },
           title:{ display:true, text:'Start & Early Fail Rates (%)', font:{family:'DM Sans', weight:'600', size:12}, color:'#676875' },
           ticks:{ font:{family:'DM Sans'}, color:'#676875', callback:v=>v+'%' }
@@ -3743,9 +3828,9 @@ function updateSeasonChart(regionKey){
     companyConversionDataset.backgroundColor = '#F29B69';
     companyConversionDataset.pointBackgroundColor = '#F29B69';
     companyConversionDataset.borderDash = [];
-    companyEarlyFailDataset.borderColor = '#087E78';
-    companyEarlyFailDataset.backgroundColor = '#087E78';
-    companyEarlyFailDataset.pointBackgroundColor = '#087E78';
+    companyEarlyFailDataset.borderColor = '#16A34A';
+    companyEarlyFailDataset.backgroundColor = '#16A34A';
+    companyEarlyFailDataset.pointBackgroundColor = '#16A34A';
     volumeDataset.hidden = true;
     volumeDataset.data = [];
     conversionDataset.hidden = true;
@@ -3783,7 +3868,7 @@ function updateSeasonMeta(regionKey){
     metaHtml = `
       <div class="legend-item"><span class="legend-swatch" style="background:#6872C9"></span>Company Volume</div>
       <div class="legend-item"><span class="legend-swatch" style="background:#F29B69"></span>Company Start Rate</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#087E78"></span>Company Early Fail Rate</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#16A34A"></span>Company Early Fail Rate</div>
     `;
   } else {
     const corr = DATA.seasonality_correlation[regionKey];
@@ -3792,7 +3877,7 @@ function updateSeasonMeta(regionKey){
     metaHtml = `
       <div class="legend-item"><span class="legend-swatch" style="background:#6872C9"></span>${regionKey} Volume</div>
       <div class="legend-item"><span class="legend-swatch" style="background:#F29B69"></span>${regionKey} Start Rate</div>
-      <div class="legend-item"><span class="legend-swatch" style="background:#087E78"></span>${regionKey} Early Fail Rate</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#16A34A"></span>${regionKey} Early Fail Rate</div>
       <div class="legend-item"><span class="legend-swatch" style="background:#B7B9C6"></span>Company reference</div>
       <div class="legend-item">Volume correlation: ${corr} · Volatility index: ${vol}${directional ? ' · Directional only (partial-year activity)' : ''}</div>
     `;
@@ -3839,9 +3924,9 @@ function buildMatrix(){
       const xMid = x.getPixelForValue(avgStart);
       const yMid = y.getPixelForValue(avgBad);
       ctx.save();
-      ctx.fillStyle = 'rgba(105,198,74,0.06)';
-      ctx.fillRect(xMid, top, right-xMid, yMid-top);
       ctx.fillStyle = 'rgba(242,155,105,0.08)';
+      ctx.fillRect(xMid, top, right-xMid, yMid-top);
+      ctx.fillStyle = 'rgba(105,198,74,0.06)';
       ctx.fillRect(xMid, yMid, right-xMid, bottom-yMid);
       ctx.fillStyle = 'rgba(103,104,117,0.04)';
       ctx.fillRect(left, top, xMid-left, yMid-top);
@@ -3959,7 +4044,6 @@ function buildMatrix(){
 buildStatList();
 initFunnelSelect();
 initSeasonSelect();
-buildMatrix();
 
 /* ==================================================================
    CHANNEL VIEW
@@ -3982,11 +4066,11 @@ function buildChannelView(){
         <div class="overview-right">
           <div class="section-head" style="padding:0; margin-bottom:22px;">
             <div>
-              <div class="section-title">Start Rate by Channel</div>
-              <div class="section-desc">Indeed carries 81% of all volume but converts near the bottom. Ranked here by conversion quality, not size.</div>
+              <div class="section-title">Volume &amp; Start Rate by Channel</div>
+              <div class="section-desc">Light bars show applicant volume; colored dots show Start Rate. Channels are ranked by conversion so scale and efficiency can be read together.</div>
             </div>
           </div>
-          <div id="channelBars"></div>
+          <div class="chart-canvas-wrap" style="height:340px;"><canvas id="channelStartRateChart"></canvas></div>
         </div>
       </div>
     </div>
@@ -4007,8 +4091,8 @@ function buildChannelView(){
     <div class="section-card plain-pad">
       <div class="section-head" style="padding:0;">
         <div>
-          <div class="section-title">Is the Channel Effect Real?</div>
-          <div class="section-desc">Each channel's actual start rate vs. what you'd expect if it were purely explained by which recruiters happen to work it. Positive bars mean the channel outperforms even after accounting for recruiter skill — a genuine effect, not a routing artifact.</div>
+          <div class="section-title">Channel Performance After Adjusting for Recruiter Mix</div>
+          <div class="section-desc">Actual Start Rate minus the rate expected from the channel's recruiter mix. Positive bars indicate performance beyond recruiter composition, but remain directional because region, timing, role mix, and candidate selection are not controlled.</div>
         </div>
       </div>
       <div class="chart-canvas-wrap" style="height:320px;"><canvas id="channelGapChart"></canvas></div>
@@ -4041,21 +4125,132 @@ function buildChannelStatList(){
 
 function buildChannelBars(){
   const sorted = [...CHANNELS].sort((a,b) => DATA.channel_performance[b].start_rate - DATA.channel_performance[a].start_rate);
-  const maxRate = Math.max(...CHANNELS.map(c => DATA.channel_performance[c].start_rate));
-  document.getElementById('channelBars').innerHTML = sorted.map(c => {
-    const d = DATA.channel_performance[c];
-    const pct = (d.start_rate/maxRate*100).toFixed(1);
-    return `
-    <div class="funnel-row" style="height:56px; grid-template-columns:150px 1fr 90px;">
-      <div class="fr-label">${c}</div>
-      <div class="fr-bar-lane">
-        <div class="fr-bar" style="width:${pct}%; height:36px; background:${CHANNEL_COLORS[c]}; background-image:none;">
-          <span class="fr-bar-num" style="${pct<20?'position:absolute;left:calc('+pct+'% + 10px);color:var(--brand-indigo);':''}">${d.start_rate}%</span>
-        </div>
-      </div>
-      <div class="fr-stats"><div class="fr-conv-total">${fmt(d.total_applicants)}</div><div class="fr-conv-step">applicants</div></div>
-    </div>`;
-  }).join('');
+  const rates = sorted.map(c => DATA.channel_performance[c].start_rate);
+  const volumes = sorted.map(c => DATA.channel_performance[c].total_applicants);
+  const overallRate = DATA.funnel_overall.pct_of_total[4];
+  const maxRate = Math.ceil((Math.max(...rates, overallRate) + 5) / 5) * 5;
+
+  const benchmarkPlugin = {
+    id:'channelStartBenchmark',
+    afterDraw(chart){
+      const {ctx, chartArea:{top,bottom}, scales:{xRate}} = chart;
+      const xPos = xRate.getPixelForValue(overallRate);
+      ctx.save();
+      ctx.strokeStyle = '#676875';
+      ctx.setLineDash([5,4]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(xPos, top);
+      ctx.lineTo(xPos, bottom);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#676875';
+      ctx.font = '600 11px DM Sans';
+      ctx.textAlign = 'center';
+      ctx.fillText(`Company ${overallRate}%`, xPos, top - 8);
+      ctx.restore();
+    }
+  };
+
+  const valueLabelPlugin = {
+    id:'channelVolumeRateLabels',
+    afterDatasetsDraw(chart){
+      const {ctx} = chart;
+      const bars = chart.getDatasetMeta(0).data;
+      const dots = chart.getDatasetMeta(1).data;
+      ctx.save();
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.font = '600 11px DM Sans';
+      ctx.fillStyle = '#676875';
+      bars.forEach((bar,i) => ctx.fillText(fmt(volumes[i]), bar.x + 6, bar.y + 10));
+      ctx.font = '700 12px DM Sans';
+      ctx.fillStyle = '#34343B';
+      dots.forEach((dot,i) => ctx.fillText(`${rates[i]}%`, dot.x + 9, dot.y));
+      ctx.restore();
+    }
+  };
+
+  new Chart(document.getElementById('channelStartRateChart').getContext('2d'), {
+    type:'bar',
+    data:{
+      labels:sorted,
+      datasets:[
+        {
+          type:'bar',
+          label:'Applicant Volume',
+          data:volumes,
+          xAxisID:'xVolume',
+          backgroundColor:'rgba(104,114,201,0.22)',
+          borderColor:'rgba(104,114,201,0.55)',
+          borderWidth:1,
+          borderRadius:7,
+          barThickness:28,
+          order:2
+        },
+        {
+          type:'line',
+          label:'Start Rate',
+          data:rates,
+          xAxisID:'xRate',
+          showLine:false,
+          pointRadius:7,
+          pointHoverRadius:9,
+          pointBackgroundColor:sorted.map(c => CHANNEL_COLORS[c]),
+          pointBorderColor:'#FFFFFF',
+          pointBorderWidth:2,
+          order:1
+        }
+      ]
+    },
+    plugins:[benchmarkPlugin, valueLabelPlugin],
+    options:{
+      indexAxis:'y',
+      responsive:true,
+      maintainAspectRatio:false,
+      layout:{padding:{top:12,right:52}},
+      plugins:{
+        legend:{
+          display:true,
+          position:'bottom',
+          labels:{usePointStyle:true,boxWidth:10,font:{family:'DM Sans'},color:'#676875'}
+        },
+        tooltip:{
+          backgroundColor:'#23206F',
+          padding:12,
+          cornerRadius:10,
+          callbacks:{
+            label:item => item.datasetIndex === 0
+              ? `Applicants: ${fmt(item.raw)}`
+              : `Start Rate: ${item.raw}%`
+          }
+        }
+      },
+      scales:{
+        xVolume:{
+          position:'bottom',
+          beginAtZero:true,
+          min:0,
+          title:{display:true,text:'Applicant Volume',font:{family:'DM Sans',weight:'600',size:12},color:'#676875'},
+          grid:{color:'#F0F0F2'},
+          ticks:{font:{family:'DM Sans'},color:'#676875',callback:v=>fmt(v)}
+        },
+        xRate:{
+          position:'top',
+          beginAtZero:true,
+          min:0,
+          max:maxRate,
+          title:{display:true,text:'Start Rate (%)',font:{family:'DM Sans',weight:'600',size:12},color:'#676875'},
+          grid:{drawOnChartArea:false},
+          ticks:{font:{family:'DM Sans'},color:'#676875',callback:v=>v+'%'}
+        },
+        y:{
+          grid:{display:false},
+          ticks:{font:{family:'DM Sans',weight:'600'},color:'#34343B'}
+        }
+      }
+    }
+  });
 }
 
 function buildChannelMatrix(){
@@ -4076,9 +4271,9 @@ function buildChannelMatrix(){
       const xMid = x.getPixelForValue(avgStart);
       const yMid = y.getPixelForValue(avgBad);
       ctx.save();
-      ctx.fillStyle = 'rgba(105,198,74,0.06)';
-      ctx.fillRect(xMid, top, right-xMid, yMid-top);
       ctx.fillStyle = 'rgba(242,155,105,0.08)';
+      ctx.fillRect(xMid, top, right-xMid, yMid-top);
+      ctx.fillStyle = 'rgba(105,198,74,0.06)';
       ctx.fillRect(xMid, yMid, right-xMid, bottom-yMid);
       ctx.fillStyle = 'rgba(103,104,117,0.04)';
       ctx.fillRect(left, top, xMid-left, yMid-top);
@@ -4203,8 +4398,8 @@ function buildRegionalView(){
         <div class="overview-right">
           <div class="section-head" style="padding:0; margin-bottom:22px;">
             <div>
-              <div class="section-title">Fixed-Effects Regression: Region Coefficient</div>
-              <div class="section-desc">Start rate effect vs. OR (reference), holding recruiter identity constant across all 42 recruiters and 33,627 applicants. Solid bars are statistically significant (p&lt;0.05).</div>
+              <div class="section-title">Recruiter-Adjusted Regional Effect vs. Company Average</div>
+              <div class="section-desc">The region coefficients are recentered to the applicant-weighted company average while holding recruiter identity constant across 42 recruiters and 33,627 applicants. Positive bars outperform the adjusted company benchmark.</div>
             </div>
           </div>
           <div class="chart-canvas-wrap" style="height:260px;"><canvas id="regressionChart"></canvas></div>
@@ -4215,51 +4410,55 @@ function buildRegionalView(){
     <div class="section-card plain-pad">
       <div class="section-head" style="padding:0;">
         <div>
-          <div class="section-title">Confound-Checked Region Comparison</div>
-          <div class="section-desc">Every method reaches the same conclusion through a different route — mix-adjustment (does composition explain it?), within-recruiter comparison (same person, different region), and the regression above. Convergence across independent methods is what makes this reliable.</div>
+          <div class="section-title">Regional Performance: Conversion vs. Bad-Hire Rate</div>
+          <div class="section-desc">Each bubble is a region, sized by applicant volume. Position shows how each region balances candidate conversion with keeping starters past 90 days.</div>
         </div>
       </div>
-      <div id="regionalTable"></div>
-    </div>
-
-    <div class="section-card plain-pad">
-      <div class="section-head" style="padding:0;">
-        <div>
-          <div class="section-title">Within-Recruiter Head-to-Head Win Rate</div>
-          <div class="section-desc">For recruiters who work 30+ applicants in two or more regions, how often does each region "win" — the same person converting better there than in their other region?</div>
-        </div>
+      <div class="matrix-wrap">
+        <div class="matrix-canvas-wrap"><canvas id="matrixChart"></canvas></div>
+        <div class="quadrant-key" id="quadrantKey"></div>
       </div>
-      <div class="chart-canvas-wrap" style="height:300px;"><canvas id="winRateChart"></canvas></div>
+      <div class="footnote">Bad-hire rate = % of starters terminated for No Show, Performance, or Culture within 90 days. UT, NE, and SC (each under 200 applicants for the year) are shown smaller and muted — directional only, not reliable for comparison.</div>
     </div>
   `;
   buildRegionalStatList();
   buildRegressionChart();
-  buildRegionalTable();
-  buildWinRateChart();
+  buildMatrix();
 }
 
 function buildRegionalStatList(){
   const rd = DATA.regional_deep_dive;
-  const sigRegions = MAJOR_REGIONS.filter(r => rd[r].fixed_effects_regression.significant);
-  const best = MAJOR_REGIONS.reduce((a,b) => rd[a].fixed_effects_regression.coef_vs_reference > rd[b].fixed_effects_regression.coef_vs_reference ? a : b);
-  const worst = MAJOR_REGIONS.reduce((a,b) => rd[a].fixed_effects_regression.coef_vs_reference < rd[b].fixed_effects_regression.coef_vs_reference ? a : b);
+  const effects = getCompanyCenteredRegionEffects();
+  const best = MAJOR_REGIONS.reduce((a,b) => effects[a] > effects[b] ? a : b);
+  const worst = MAJOR_REGIONS.reduce((a,b) => effects[a] < effects[b] ? a : b);
   const stats = [
-    { value: best, label:'Strongest region, confirmed by regression (p<0.001)' },
-    { value: worst, label:'Weakest region, confirmed by regression (p<0.001)' },
-    { value: sigRegions.length + ' of 7', label:'regions show a statistically significant effect' },
-    { value: rd['LA'].within_recruiter_comparison.win_rate_pct + '%', label:'LA win rate in same-recruiter head-to-heads' },
+    { value: best, label:'Strongest recruiter-adjusted effect vs. company average' },
+    { value: worst, label:'Weakest recruiter-adjusted effect vs. company average' },
+    { value: '33,627', label:'applicants included in the adjusted regional model' },
+    { value: rd['MA'].early_fail_source_mix_adjusted.actual + '%', label:'MA bad-hire rate — lowest among major regions' },
   ];
   document.getElementById('regionalStatList').innerHTML = stats.map(s => `
     <div class="stat-row"><div class="stat-value">${s.value}</div><div class="stat-label">${s.label}</div></div>
   `).join('');
 }
 
+function getCompanyCenteredRegionEffects(){
+  const rd = DATA.regional_deep_dive;
+  const totalWeight = MAJOR_REGIONS.reduce((sum,r) => sum + DATA.region_meta[r].total_applicants, 0);
+  const weightedMean = MAJOR_REGIONS.reduce((sum,r) =>
+    sum + rd[r].fixed_effects_regression.coef_vs_reference * DATA.region_meta[r].total_applicants, 0
+  ) / totalWeight;
+  return Object.fromEntries(MAJOR_REGIONS.map(r => [
+    r,
+    Number((rd[r].fixed_effects_regression.coef_vs_reference - weightedMean).toFixed(1))
+  ]));
+}
+
 function buildRegressionChart(){
   const ctx = document.getElementById('regressionChart').getContext('2d');
-  const rd = DATA.regional_deep_dive;
-  const sorted = [...MAJOR_REGIONS].sort((a,b) => rd[b].fixed_effects_regression.coef_vs_reference - rd[a].fixed_effects_regression.coef_vs_reference);
-  const coefs = sorted.map(r => rd[r].fixed_effects_regression.coef_vs_reference);
-  const sig = sorted.map(r => rd[r].fixed_effects_regression.significant);
+  const effects = getCompanyCenteredRegionEffects();
+  const sorted = [...MAJOR_REGIONS].sort((a,b) => effects[b] - effects[a]);
+  const coefs = sorted.map(r => effects[r]);
 
   new Chart(ctx, {
     type:'bar',
@@ -4267,11 +4466,7 @@ function buildRegressionChart(){
       labels: sorted,
       datasets:[{
         data: coefs,
-        backgroundColor: sorted.map((r,i) => {
-          if (r === 'OR') return '#B7B9C6';
-          const c = coefs[i] >= 0 ? '105,198,74' : '242,155,105';
-          return sig[i] ? `rgba(${c},1)` : `rgba(${c},0.35)`;
-        }),
+        backgroundColor: coefs.map(v => v >= 0 ? '#69C64A' : '#F29B69'),
         borderRadius:8,
         maxBarThickness:52
       }]
@@ -4283,16 +4478,11 @@ function buildRegressionChart(){
         tooltip:{
           backgroundColor:'#23206F', padding:12, cornerRadius:10,
           titleFont:{family:'DM Sans', weight:'700'}, bodyFont:{family:'DM Sans'},
-          callbacks:{ label: item => {
-            const r = sorted[item.dataIndex];
-            if (r==='OR') return 'Reference region';
-            const p = rd[r].fixed_effects_regression.p_value;
-            return [`${item.raw>0?'+':''}${item.raw} pts vs OR`, `p = ${p}${sig[item.dataIndex]?' (significant)':' (not significant)'}`];
-          }}
+          callbacks:{ label: item => `${item.raw>0?'+':''}${item.raw} pts vs. company average` }
         }
       },
       scales:{
-        y:{ title:{display:true, text:'Effect vs. OR (pts)', font:{family:'DM Sans', weight:'600', size:12}, color:'#676875'}, grid:{color:'#F0F0F2'}, ticks:{font:{family:'DM Sans'}, color:'#676875', callback:v=>(v>0?'+':'')+v} },
+        y:{ title:{display:true, text:'Effect vs. Company Average (pts)', font:{family:'DM Sans', weight:'600', size:12}, color:'#676875'}, grid:{color:'#F0F0F2'}, ticks:{font:{family:'DM Sans'}, color:'#676875', callback:v=>(v>0?'+':'')+v} },
         x:{ grid:{display:false}, ticks:{font:{family:'DM Sans', weight:'600'}, color:'#34343B'} }
       }
     }
@@ -4301,7 +4491,8 @@ function buildRegressionChart(){
 
 function buildRegionalTable(){
   const rd = DATA.regional_deep_dive;
-  const sorted = [...MAJOR_REGIONS].sort((a,b) => rd[b].fixed_effects_regression.coef_vs_reference - rd[a].fixed_effects_regression.coef_vs_reference);
+  const effects = getCompanyCenteredRegionEffects();
+  const sorted = [...MAJOR_REGIONS].sort((a,b) => effects[b] - effects[a]);
 
   const rows = sorted.map(r => {
     const d = rd[r];
@@ -4312,8 +4503,7 @@ function buildRegionalTable(){
       <td style="${gapClass(d.start_rate_recruiter_mix_adjusted.gap)}">${d.start_rate_recruiter_mix_adjusted.gap>0?'+':''}${d.start_rate_recruiter_mix_adjusted.gap} pts</td>
       <td style="${gapClass(-d.early_fail_source_mix_adjusted.gap)}">${d.early_fail_source_mix_adjusted.gap>0?'+':''}${d.early_fail_source_mix_adjusted.gap} pts</td>
       <td>${d.within_recruiter_comparison.win_rate_pct !== null ? d.within_recruiter_comparison.win_rate_pct+'%' : '—'}</td>
-      <td style="${gapClass(d.fixed_effects_regression.coef_vs_reference)}">${d.fixed_effects_regression.coef_vs_reference>0?'+':''}${d.fixed_effects_regression.coef_vs_reference} pts</td>
-      <td>${d.fixed_effects_regression.significant ? '✓ Significant' : '— n.s.'}</td>
+      <td style="${gapClass(effects[r])}">${effects[r]>0?'+':''}${effects[r]} pts</td>
       <td>${d.dedicated_recruiter_stats.n_dedicated}</td>
     </tr>`;
   }).join('');
@@ -4326,8 +4516,7 @@ function buildRegionalTable(){
           <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Start-Rate Gap<br>(recruiter mix)</th>
           <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Early-Fail Gap<br>(source mix)</th>
           <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Within-Recruiter<br>Win Rate</th>
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Regression<br>Coefficient</th>
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Statistical<br>Significance</th>
+          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Adjusted Effect<br>vs. Company Avg.</th>
           <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;"># Dedicated<br>Recruiters</th>
         </tr>
       </thead>
@@ -4405,12 +4594,13 @@ function buildRecruiterView(){
     <div class="section-card plain-pad">
       <div class="section-head" style="padding:0;">
         <div>
-          <div class="section-title">Full Scorecard — Main Cohort (200+ applicants)</div>
-          <div class="section-desc">Sorted by total cross-metric flags, then start-rate gap. Flags require clearing a 2 SD threshold (start rate, early-fail) or bottom-decile (offer→start) — not just ranking last.</div>
+          <div class="section-title">Full Scorecard — All Recruiters</div>
+          <div class="section-desc">Click any column header to sort. Pale red rows marked “Directional · &lt;200” remain visible but are not rated; flags are reserved for recruiters with sufficient applicant volume.</div>
         </div>
       </div>
       <div id="recruiterTable" style="overflow-x:auto;"></div>
     </div>
+
   `;
   buildRecruiterStatList();
   buildRecruiterScatter();
@@ -4521,13 +4711,39 @@ function buildRecruiterScatter(){
   });
 }
 
+let recruiterTableSort = { key:'total_flags', direction:'desc' };
+
 function buildRecruiterTable(){
   const rp = DATA.recruiter_performance;
-  const mainCohort = Object.keys(rp).filter(r => rp[r].in_main_cohort_200plus);
-  const sorted = mainCohort.sort((a,b) => {
-    if (rp[b].total_flags !== rp[a].total_flags) return rp[b].total_flags - rp[a].total_flags;
-    return rp[a].start_rate_gap_region_mix - rp[b].start_rate_gap_region_mix;
+  const allRecruiters = Object.keys(rp);
+  const {key,direction} = recruiterTableSort;
+  const multiplier = direction === 'asc' ? 1 : -1;
+  const valueFor = r => key === 'recruiter' ? r : (key === 'total_flags' && !rp[r].in_main_cohort_200plus ? null : rp[r][key]);
+  const sorted = [...allRecruiters].sort((a,b) => {
+    const av = valueFor(a), bv = valueFor(b);
+    if (av === null || av === undefined) return bv === null || bv === undefined ? a.localeCompare(b) : 1;
+    if (bv === null || bv === undefined) return -1;
+    const comparison = typeof av === 'string' ? av.localeCompare(bv, undefined, {numeric:true}) : av - bv;
+    return comparison === 0 ? a.localeCompare(b, undefined, {numeric:true}) : comparison * multiplier;
   });
+
+  const columns = [
+    {key:'recruiter', label:'Recruiter'},
+    {key:'total_vs_volume', label:'Volume'},
+    {key:'start_rate_raw', label:'Start Rate'},
+    {key:'start_rate_gap_region_mix', label:'Start Gap<br>(region-adj.)'},
+    {key:'early_fail_gap_region_mix', label:'Early-Fail Gap<br>(region-adj.)'},
+    {key:'offer_to_start_rate_raw', label:'Offer→Start'},
+    {key:'vs_per_active_month', label:'VS/Month'},
+    {key:'total_flags', label:'Flags'}
+  ];
+  const headerHtml = columns.map(c => {
+    const active = c.key === key;
+    const arrow = active ? (direction === 'asc' ? '↑' : '↓') : '↕';
+    return `<th style="text-align:left; padding:0; color:var(--text-muted); font-weight:600;">
+      <button class="recruiter-sort-button${active?' active':''}" data-sort="${c.key}" aria-label="Sort by ${c.label.replace(/<br>/g,' ')}">${c.label}<span class="sort-arrow">${arrow}</span></button>
+    </th>`;
+  }).join('');
 
   const flagBadge = n => n === 0 ? '<span style="color:#B7B9C6;">—</span>' :
     `<span style="background:${n>=2?'#F29B69':'#6872C9'}; color:white; padding:3px 9px; border-radius:999px; font-weight:700; font-size:12px;">${n}</span>`;
@@ -4535,8 +4751,94 @@ function buildRecruiterTable(){
 
   const rows = sorted.map(r => {
     const d = rp[r];
+    const directional = !d.in_main_cohort_200plus;
+    return `<tr class="${directional?'directional-recruiter-row':''}">
+      <td style="font-weight:700; color:var(--brand-indigo); white-space:nowrap;">${r}${directional?'<span class="directional-badge">Directional · &lt;200</span>':''}</td>
+      <td>${fmt(d.total_vs_volume)}</td>
+      <td>${d.start_rate_raw}%</td>
+      <td style="${gapColor(d.start_rate_gap_region_mix)}">${d.start_rate_gap_region_mix>0?'+':''}${d.start_rate_gap_region_mix}</td>
+      <td style="${d.early_fail_gap_region_mix!==null?gapColor(-d.early_fail_gap_region_mix):''}">${d.early_fail_gap_region_mix!==null?(d.early_fail_gap_region_mix>0?'+':'')+d.early_fail_gap_region_mix:'—'}</td>
+      <td>${d.offer_to_start_rate_raw!==null?d.offer_to_start_rate_raw+'%':'—'}</td>
+      <td>${d.vs_per_active_month}</td>
+      <td>${directional?'<span class="not-rated">Not rated</span>':flagBadge(d.total_flags)}</td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('recruiterTable').innerHTML = `
+    <table style="width:100%; min-width:800px; border-collapse:collapse; font-size:13.5px;">
+      <thead>
+        <tr style="border-bottom:2px solid var(--border);">${headerHtml}</tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <style>
+      #recruiterTable tbody tr{border-bottom:1px solid var(--border);}
+      #recruiterTable tbody td{padding:11px 12px;}
+      #recruiterTable .directional-recruiter-row{background:rgba(242,155,105,0.10);}
+      #recruiterTable .directional-recruiter-row:hover{background:rgba(242,155,105,0.17);}
+      .directional-badge{display:inline-block;margin-left:8px;padding:2px 7px;border-radius:999px;background:#C95F4A;color:#FFFFFF;font-size:10px;font-weight:700;letter-spacing:0.02em;vertical-align:1px;}
+      .not-rated{color:#C95F4A;font-size:11px;font-weight:700;white-space:nowrap;}
+      .recruiter-sort-button{appearance:none;border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:10px 12px;width:100%;cursor:pointer;white-space:nowrap;line-height:1.25;}
+      .recruiter-sort-button:hover,.recruiter-sort-button:focus-visible{background:var(--bg-blue);color:var(--brand-indigo);outline:none;}
+      .recruiter-sort-button.active{color:var(--brand-indigo);font-weight:700;}
+      .sort-arrow{display:inline-block;margin-left:6px;font-size:12px;color:#9A9AA5;}
+      .recruiter-sort-button.active .sort-arrow{color:var(--brand-indigo);}
+    </style>
+  `;
+
+  document.querySelectorAll('#recruiterTable .recruiter-sort-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const newKey = button.dataset.sort;
+      recruiterTableSort = {
+        key:newKey,
+        direction:newKey === recruiterTableSort.key
+          ? (recruiterTableSort.direction === 'asc' ? 'desc' : 'asc')
+          : (newKey === 'recruiter' ? 'asc' : 'desc')
+      };
+      buildRecruiterTable();
+    });
+  });
+}
+
+let directionalRecruiterTableSort = { key:'total_vs_volume', direction:'desc' };
+
+function buildDirectionalRecruiterTable(){
+  const rp = DATA.recruiter_performance;
+  const cohort = Object.keys(rp).filter(r => !rp[r].in_main_cohort_200plus);
+  const {key,direction} = directionalRecruiterTableSort;
+  const multiplier = direction === 'asc' ? 1 : -1;
+  const valueFor = r => key === 'recruiter' ? r : rp[r][key];
+  const sorted = [...cohort].sort((a,b) => {
+    const av = valueFor(a), bv = valueFor(b);
+    if (av === null || av === undefined) return bv === null || bv === undefined ? a.localeCompare(b) : 1;
+    if (bv === null || bv === undefined) return -1;
+    const comparison = typeof av === 'string' ? av.localeCompare(bv, undefined, {numeric:true}) : av - bv;
+    return comparison === 0 ? a.localeCompare(b, undefined, {numeric:true}) : comparison * multiplier;
+  });
+  const columns = [
+    {key:'recruiter', label:'Recruiter'},
+    {key:'total_vs_volume', label:'Volume'},
+    {key:'start_rate_raw', label:'Start Rate'},
+    {key:'start_rate_gap_region_mix', label:'Start Gap<br>(region-adj.)'},
+    {key:'early_fail_gap_region_mix', label:'Early-Fail Gap<br>(region-adj.)'},
+    {key:'offer_to_start_rate_raw', label:'Offer→Start'},
+    {key:'vs_per_active_month', label:'VS/Month'},
+    {key:'total_flags', label:'Flags'}
+  ];
+  const headerHtml = columns.map(c => {
+    const active = c.key === key;
+    const arrow = active ? (direction === 'asc' ? '↑' : '↓') : '↕';
+    return `<th style="text-align:left;padding:0;color:var(--text-muted);font-weight:600;">
+      <button class="directional-sort-button${active?' active':''}" data-sort="${c.key}">${c.label}<span class="sort-arrow">${arrow}</span></button>
+    </th>`;
+  }).join('');
+  const flagBadge = n => n === 0 ? '<span style="color:#B7B9C6;">—</span>' :
+    `<span style="background:${n>=2?'#F29B69':'#6872C9'};color:white;padding:3px 9px;border-radius:999px;font-weight:700;font-size:12px;">${n}</span>`;
+  const gapColor = v => v > 0 ? 'color:#4a8f34;font-weight:600;' : v < 0 ? 'color:#c76f34;font-weight:600;' : 'color:#676875;';
+  const rows = sorted.map(r => {
+    const d = rp[r];
     return `<tr>
-      <td style="font-weight:700; color:var(--brand-indigo); white-space:nowrap;">${r}</td>
+      <td style="font-weight:700;color:var(--brand-indigo);white-space:nowrap;">${r}</td>
       <td>${fmt(d.total_vs_volume)}</td>
       <td>${d.start_rate_raw}%</td>
       <td style="${gapColor(d.start_rate_gap_region_mix)}">${d.start_rate_gap_region_mix>0?'+':''}${d.start_rate_gap_region_mix}</td>
@@ -4546,25 +4848,31 @@ function buildRecruiterTable(){
       <td>${flagBadge(d.total_flags)}</td>
     </tr>`;
   }).join('');
-
-  document.getElementById('recruiterTable').innerHTML = `
-    <table style="width:100%; min-width:800px; border-collapse:collapse; font-size:13.5px;">
-      <thead>
-        <tr style="border-bottom:2px solid var(--border);">
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Recruiter</th>
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Volume</th>
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Start Rate</th>
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Start Gap<br>(region-adj.)</th>
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Early-Fail Gap<br>(region-adj.)</th>
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Offer→Start</th>
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">VS/Month</th>
-          <th style="text-align:left; padding:10px 12px; color:var(--text-muted); font-weight:600;">Flags</th>
-        </tr>
-      </thead>
+  document.getElementById('recruiterDirectionalTable').innerHTML = `
+    <table style="width:100%;min-width:800px;border-collapse:collapse;font-size:13.5px;">
+      <thead><tr style="border-bottom:2px solid var(--border);">${headerHtml}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
-    <style>#recruiterTable tbody tr{border-bottom:1px solid var(--border);} #recruiterTable tbody td{padding:11px 12px;}</style>
-  `;
+    <style>
+      #recruiterDirectionalTable tbody tr{border-bottom:1px solid var(--border);}
+      #recruiterDirectionalTable tbody td{padding:11px 12px;}
+      .directional-sort-button{appearance:none;border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:10px 12px;width:100%;cursor:pointer;white-space:nowrap;line-height:1.25;}
+      .directional-sort-button:hover,.directional-sort-button:focus-visible{background:var(--bg-blue);color:var(--brand-indigo);outline:none;}
+      .directional-sort-button.active{color:var(--brand-indigo);font-weight:700;}
+      .directional-sort-button.active .sort-arrow{color:var(--brand-indigo);}
+    </style>`;
+  document.querySelectorAll('#recruiterDirectionalTable .directional-sort-button').forEach(button => {
+    button.addEventListener('click', () => {
+      const newKey = button.dataset.sort;
+      directionalRecruiterTableSort = {
+        key:newKey,
+        direction:newKey === directionalRecruiterTableSort.key
+          ? (directionalRecruiterTableSort.direction === 'asc' ? 'desc' : 'asc')
+          : (newKey === 'recruiter' ? 'asc' : 'desc')
+      };
+      buildDirectionalRecruiterTable();
+    });
+  });
 }
 
 /* ==================================================================
@@ -4583,10 +4891,10 @@ function buildCandidateView(){
           <div class="section-head" style="padding:0; margin-bottom:22px;">
             <div>
               <div class="section-title">Median Tenure by Term Reason</div>
-              <div class="section-desc">Sorted shortest to longest. No Show, Performance, and Culture cluster at the bottom — hiring-process failures, not life-driven attrition.</div>
+              <div class="section-desc">Position shows median tenure; bubble area shows termination volume. Orange marks reasons included in the early-fail definition.</div>
             </div>
           </div>
-          <div class="chart-canvas-wrap" style="height:320px;"><canvas id="tenureReasonChart"></canvas></div>
+          <div class="chart-canvas-wrap" style="height:420px;"><canvas id="tenureReasonChart"></canvas></div>
         </div>
       </div>
     </div>
@@ -4649,21 +4957,60 @@ function buildCandidateStatList(){
 function buildTenureReasonChart(){
   const ctx = document.getElementById('tenureReasonChart').getContext('2d');
   const t = [...DATA.candidate_insight.term_reason_table].sort((a,b) => a.median_tenure - b.median_tenure);
+  const maxCount = Math.max(...t.map(r => r.count));
+  const radii = t.map(r => Math.max(4, Math.sqrt(r.count/maxCount)*15));
+
+  const lollipopStems = {
+    id:'tenureReasonStems',
+    beforeDatasetsDraw(chart){
+      const {ctx, scales:{x}} = chart;
+      const points = chart.getDatasetMeta(0).data;
+      const zeroX = x.getPixelForValue(0);
+      ctx.save();
+      ctx.strokeStyle = 'rgba(183,185,198,0.65)';
+      ctx.lineWidth = 2;
+      points.forEach(point => {
+        ctx.beginPath();
+        ctx.moveTo(zeroX, point.y);
+        ctx.lineTo(point.x, point.y);
+        ctx.stroke();
+      });
+      ctx.restore();
+    }
+  };
+
+  const volumeLabels = {
+    id:'tenureReasonVolumeLabels',
+    afterDatasetsDraw(chart){
+      const {ctx} = chart;
+      const points = chart.getDatasetMeta(0).data;
+      ctx.save();
+      ctx.font = '700 11px DM Sans';
+      ctx.fillStyle = '#676875';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      points.forEach((point,i) => ctx.fillText(`n=${fmt(t[i].count)}`, point.x + radii[i] + 5, point.y));
+      ctx.restore();
+    }
+  };
 
   new Chart(ctx, {
-    type:'bar',
+    type:'bubble',
     data:{
       labels: t.map(r => r.reason),
       datasets:[{
-        data: t.map(r => r.median_tenure),
+        label:'Term reasons',
+        data: t.map((r,i) => ({x:r.median_tenure, y:r.reason, r:radii[i]})),
         backgroundColor: t.map(r => r.is_early_fail_category ? '#F29B69' : '#6872C9'),
-        borderRadius:8,
-        maxBarThickness:34
+        borderColor:'#FFFFFF',
+        borderWidth:2,
+        hoverRadius:2
       }]
     },
+    plugins:[lollipopStems, volumeLabels],
     options:{
-      indexAxis:'y',
       responsive:true, maintainAspectRatio:false,
+      layout:{padding:{right:45}},
       plugins:{
         legend:{display:false},
         tooltip:{
@@ -4676,8 +5023,8 @@ function buildTenureReasonChart(){
         }
       },
       scales:{
-        x:{ title:{display:true, text:'Median Tenure (days)', font:{family:'DM Sans', weight:'600', size:12}, color:'#676875'}, grid:{color:'#F0F0F2'} },
-        y:{ grid:{display:false}, ticks:{font:{family:'DM Sans', weight:'600', size:11}, color:'#34343B'} }
+        x:{ beginAtZero:true, title:{display:true, text:'Median Tenure (days)', font:{family:'DM Sans', weight:'600', size:12}, color:'#676875'}, grid:{color:'#F0F0F2'} },
+        y:{ type:'category', labels:t.map(r => r.reason), grid:{display:false}, ticks:{font:{family:'DM Sans', weight:'600', size:11}, color:'#34343B'} }
       }
     }
   });
@@ -4769,14 +5116,23 @@ function buildTermTenureHeatmap(){
 
 
 const VIEW_META = {
-  overall:   { eyebrow:'2023 Annual Review', title:'Overall Recruiting Performance', sub:'A company-wide view of the hiring funnel, seasonal patterns, and how each region balances conversion against early-hire quality.' },
-  channel:   { eyebrow:'Sourcing', title:'Channel Performance', sub:'Where applicants come from, how well each channel converts, and whether that quality is real or just an artifact of who happens to work each source.' },
-  regional:  { eyebrow:'Confound-Checked', title:'Regional Deep-Dive', sub:'Regional performance after adjusting for recruiter and source mix — separating a genuine regional effect from who happens to be assigned there.' },
-  recruiter: { eyebrow:'Individual Performance', title:'Recruiter Scorecard', sub:'Every recruiter measured across four independent, calibrated metrics — flagged only when a gap survives adjustment for source and region.' },
-  candidate: { eyebrow:'Outcomes', title:'Candidate Insight', sub:'Why people leave, how long they stay, and which reasons cluster by channel or region.' }
+  overall:   { eyebrow:'2023 Annual Review', title:'Overall Recruiting Performance', sub:'6,972 hires started from 34,058 virtual screens; scaling efficiency varied materially by month.', rec:'Prepare capacity for August and October, while investigating October’s weak conversion and April’s elevated early-fail rate.' },
+  channel:   { eyebrow:'Sourcing', title:'Channel Performance', sub:'Indeed supplies 81% of volume; Referral and Website convert better, while Hiring Events carry the highest early-fail risk.', rec:'Increase Referral and Website sourcing, retain Indeed pending ROI analysis, and strengthen Hiring Event quality controls.' },
+  regional:  { eyebrow:'Regional Performance', title:'Regional Deep-Dive', sub:'LA leads recruiter-adjusted conversion, WI trails, and MA delivers the lowest major-region bad-hire rate.', rec:'Codify LA’s conversion practices, study MA’s quality controls, establish a targeted WI strategy, and investigate CA’s February–March volume decline.' },
+  recruiter: { eyebrow:'Individual Performance', title:'Recruiter Scorecard', sub:'Eight of 33 sufficient-volume recruiters are flagged; Recruiters 29 and 12 require cross-metric review.', rec:'For low productivity, review workload and active tenure; for low conversion, coach funnel execution; for high early-fail rates, audit screening and onboarding decisions.' },
+  candidate: { eyebrow:'Outcomes', title:'Candidate Insight', sub:'No Show creates the most immediate retention exposure, while Career Change and Life Circumstances drive comparable departure volume later in tenure.', rec:'Prioritize pre-start confirmation and first-week attendance controls as the most immediate response to No Shows.' }
 };
 
 const viewBuilt = { overall:true, channel:false, regional:false, recruiter:false, candidate:false };
+
+function updatePageHero(key){
+  const m = VIEW_META[key];
+  document.getElementById('pageEyebrow').textContent = m.eyebrow;
+  document.getElementById('pageTitle').textContent = m.title;
+  document.getElementById('pageSub').textContent = m.sub;
+  document.getElementById('pageRecommendationLabel').textContent = `${m.title.replace(' Performance','')} priority`;
+  document.getElementById('pageRecommendation').textContent = m.rec;
+}
 
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -4786,10 +5142,7 @@ document.querySelectorAll('.tab').forEach(tab => {
     document.querySelectorAll('.view').forEach(v => v.style.display = 'none');
     document.getElementById('view-' + key).style.display = 'block';
 
-    const m = VIEW_META[key];
-    document.getElementById('pageEyebrow').textContent = m.eyebrow;
-    document.getElementById('pageTitle').textContent = m.title;
-    document.getElementById('pageSub').textContent = m.sub;
+    updatePageHero(key);
 
     if (!viewBuilt[key]){
       if (key === 'channel') buildChannelView();
