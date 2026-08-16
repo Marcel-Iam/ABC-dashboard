@@ -4109,13 +4109,14 @@ function buildChannelView(){
 
 function buildChannelStatList(){
   const indeedShare = DATA.channel_performance['Indeed'].pct_of_total_volume;
+  const indeed = DATA.channel_performance['Indeed'];
+  const linkedin = DATA.channel_performance['LinkedIn'];
   const best = CHANNELS.reduce((a,b) => DATA.channel_performance[a].start_rate > DATA.channel_performance[b].start_rate ? a : b);
-  const worst = CHANNELS.reduce((a,b) => DATA.channel_performance[a].start_rate < DATA.channel_performance[b].start_rate ? a : b);
   const stats = [
     { value: indeedShare + '%', label:'of all volume comes from Indeed' },
     { value: best, label:'Best converting channel (' + DATA.channel_performance[best].start_rate + '%)' },
-    { value: worst, label:'Weakest converting channel (' + DATA.channel_performance[worst].start_rate + '%)' },
-    { value: DATA.channel_performance['Company Website'].bad_hire_rate + '%', label:'Company Website bad-hire rate — lowest of any channel' },
+    { value: 'Indeed', label:'Primary channel converts at ' + indeed.start_rate + '% (' + fmt(indeed.n_starters) + ' starts)' },
+    { value: 'LinkedIn', label:'Highest-potential pilot: ' + linkedin.start_rate + '% start rate — ' + fmt(linkedin.total_applicants) + ' applicants produced ' + fmt(linkedin.n_starters) + ' starts with zero early bad hires' },
   ];
   document.getElementById('channelStatList').innerHTML = stats.map(s => `
     <div class="stat-row">
@@ -4943,13 +4944,13 @@ function buildCandidateStatList(){
   const totalTermed = t.reduce((s,r) => s+r.count, 0);
   const topReason = [...t].sort((a,b) => b.count - a.count)[0];
   const shortest = [...t].sort((a,b) => a.median_tenure - b.median_tenure)[0];
-  const longest = [...t].sort((a,b) => b.median_tenure - a.median_tenure)[0];
+  const moving = t.find(r => r.reason === 'Moving');
 
   const stats = [
     { value: fmt(totalTermed), label:'total departures with a recorded reason' },
     { value: topReason.reason, label:'most common reason (' + topReason.count + ' cases, ' + topReason.pct_of_started + '% of starters)' },
     { value: shortest.reason, label:'shortest median tenure (' + shortest.median_tenure + ' days)' },
-    { value: longest.reason, label:'longest median tenure (' + longest.median_tenure + ' days)' },
+    { value: moving.reason, label:'median tenure before moving-related departures (' + moving.median_tenure + ' days; ' + moving.count + ' cases)' },
   ];
   document.getElementById('candidateStatList').innerHTML = stats.map(s => `
     <div class="stat-row"><div class="stat-value" style="font-size:22px;">${s.value}</div><div class="stat-label">${s.label}</div></div>
@@ -5119,7 +5120,7 @@ function buildTermTenureHeatmap(){
 
 const VIEW_META = {
   overall:   { eyebrow:'2023 Annual Review', title:'Overall Recruiting Performance', sub:'6,972 hires started from 34,058 virtual screens; scaling efficiency varied materially by month.', rec:'Prepare capacity for August and October, while investigating October’s weak conversion and April’s elevated early-fail rate.' },
-  channel:   { eyebrow:'Sourcing', title:'Channel Performance', sub:'Indeed supplies 81% of volume; Referral and Website convert better, while Hiring Events carry the highest early-fail risk.', rec:'Increase Referral and Website sourcing, retain Indeed pending ROI analysis, and strengthen Hiring Event quality controls.' },
+  channel:   { eyebrow:'Sourcing', title:'Channel Performance', sub:'Indeed supplies 81% of volume; Referral and Website convert better, while Hiring Events carry the highest early-fail risk.', rec:'Increase Referral and Website sourcing, pilot test LinkedIn, retain Indeed pending ROI analysis, and strengthen Hiring Event quality controls.' },
   regional:  { eyebrow:'Regional Performance', title:'Regional Deep-Dive', sub:'LA leads recruiter-adjusted conversion, WI trails, and MA delivers the lowest major-region bad-hire rate.', rec:'Codify LA’s conversion practices, study MA’s quality controls, establish a targeted WI strategy, and investigate CA’s February–March volume decline.' },
   recruiter: { eyebrow:'Individual Performance', title:'Recruiter Scorecard', sub:'Eight of 33 sufficient-volume recruiters are flagged; Recruiters 29 and 12 require cross-metric review.', rec:'For low productivity, review workload and active tenure; for low conversion, coach funnel execution; for high early-fail rates, audit screening and onboarding decisions.' },
   candidate: { eyebrow:'Outcomes', title:'Candidate Insight', sub:'No Show creates the most immediate retention exposure, while Career Change and Life Circumstances drive comparable departure volume later in tenure.', rec:'Prioritize pre-start confirmation and first-week attendance controls as the most immediate response to No Shows.' }
